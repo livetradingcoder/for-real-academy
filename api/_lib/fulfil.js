@@ -1,6 +1,25 @@
 import { query } from './db.js';
 import { COURSES, INSTALMENTS, grants } from './catalog.js';
 
+export async function findOrCreateUser(email, name) {
+  const { rows } = await query(
+    `INSERT INTO users (email, name, password_hash) VALUES ($1,$2,NULL)
+     ON CONFLICT (email) DO UPDATE SET name = COALESCE(users.name, EXCLUDED.name)
+     RETURNING id, email, name, (password_hash IS NOT NULL) AS has_password`,
+    [String(email).trim().toLowerCase(), name || null]
+  );
+  return rows[0];
+}
+
+// Who a checkout belongs to: the logged-in user who started it, or the email typed at checkout (guest).
+export async function userFromMetadata(md) {
+  if (md.user_id) {
+    const { rows } = await query('SELECT id, email, name, (password_hash IS NOT NULL) AS has_password FROM users WHERE id = $1', [md.user_id]);
+    return rows[0] || null;
+  }
+  return md.email ? findOrCreateUser(md.email, md.name) : null;
+}
+
 export async function grant({ userId, course, plan, orderId, checkoutId, subscriptionId }) {
   for (const id of grants(course)) {
     await query(
@@ -19,8 +38,9 @@ export async function grant({ userId, course, plan, orderId, checkoutId, subscri
 export async function onOrderPaid(order, client) {
   const md = order.metadata || {};
   let userId, course, plan;
-  if (md.academy === '1' && COURSES[md.course_id]) {
-    ({ user_id: userId, course_id: course, plan } = md);
+  if (md.academy === '1' && COURSES[md.course_id] && (md.user_id || md.email)) {
+    ({ course_id: course, plan } = md);
+    userId = (await userFromMetadata(md))?.id;
   } else if (order.subscription_id) {
     const { rows } = await query('SELECT user_id, course_id, plan FROM enrollments WHERE polar_subscription_id = $1 LIMIT 1', [order.subscription_id]);
     if (!rows[0]) return false;
@@ -30,8 +50,7 @@ export async function onOrderPaid(order, client) {
     if (all.rows.length > 1) course = 'bundle';
   } else return false;
   if (!userId || !COURSES[course]) return false;
-  const exists = await query('SELECT 1 FROM users WHERE id = $1', [userId]);
-  if (!exists.rows[0]) throw new Error('order for unknown user ' + userId); // 5xx -> Polar retries and it shows in the dashboard
+  if (!userId) throw new Error('order has no resolvable user'); // 5xx -> Polar retries and it shows in the dashboard
 
   const orderId = order.id;
   const subscriptionId = order.subscription_id || null;

@@ -6,6 +6,15 @@
     if (!d.user) { location.replace('/login.html?next=' + encodeURIComponent('/dashboard.html')); return; }
     document.getElementById('dash-user').textContent = d.user.name ? d.user.name : d.user.email;
     document.getElementById('logout').addEventListener('click', function () { FRA.api('/api/auth/logout', 'POST').then(function () { location.href = '/'; }); });
+    if (d.needsPassword) {
+      var b = document.getElementById('pw-banner'); b.hidden = false;
+      document.getElementById('pw-form').addEventListener('submit', function (ev) {
+        ev.preventDefault(); var er = document.getElementById('pw-error'); er.hidden = true;
+        FRA.api('/api/auth/set-password', 'POST', { password: document.getElementById('pw-pass').value }).then(function (r) {
+          if (r.ok) { b.hidden = true; } else { er.textContent = r.error || 'Could not save your password.'; er.hidden = false; }
+        });
+      });
+    }
     var owned = {}; (d.enrollments || []).forEach(function (e) { owned[e.course_id] = e; });
     var mine = cfg.courses.filter(function (c) { return c.id !== 'bundle' && owned[c.id]; });
     var others = cfg.courses.filter(function (c) { return !(c.id !== 'bundle' && owned[c.id]); });

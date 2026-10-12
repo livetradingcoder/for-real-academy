@@ -47,7 +47,7 @@ details{border-bottom:1px solid var(--hair);padding:16px 0}summary{cursor:pointe
 .steps{counter-reset:s;list-style:none;padding:0}.steps li{counter-increment:s;padding:0 0 18px 48px;position:relative}
 .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font:500 .9rem var(--font-m)}
 form label{display:block;font-size:.9rem;margin:14px 0 6px}
-input[type=text],input[type=email],textarea,select{width:100%;padding:12px;border:1px solid var(--hair);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;padding:12px;border:1px solid var(--hair);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
 .footer{background:var(--foot);color:#c9c9d0;padding:56px 0 32px;font-size:.9rem;border-top:1px solid var(--hair)}.footer a{color:#fff}.footer .cols{display:flex;gap:40px;flex-wrap:wrap;justify-content:space-between}
 .footer .addr{max-width:320px;line-height:1.6}.footer .links{line-height:1.9}.footer .links strong{color:#fff;display:block;margin-bottom:4px}
 .legal{max-width:760px;padding:56px 20px 80px;margin:0 auto}.legal h2{font-size:1.4rem;margin-top:1.6em}

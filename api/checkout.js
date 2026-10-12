@@ -1,19 +1,28 @@
-import { currentUser } from './_lib/auth.js';
-import { json, bad, body, sameOrigin, siteUrl } from './_lib/http.js';
+import { currentUser, validEmail } from './_lib/auth.js';
+import { json, bad, body, sameOrigin, siteUrl, limited } from './_lib/http.js';
 import { COURSES, PLANS, grants } from './_lib/catalog.js';
 import { polar, polarConfigured, findProduct } from './_lib/polar.js';
 import { query } from './_lib/db.js';
 
+// Guest checkout: no account is needed to pay. The account is created from the payment (webhook / success page)
+// and the buyer sets a password right after.
 export async function POST(req) {
   if (!sameOrigin(req)) return bad('Forbidden', 403);
-  const user = await currentUser(req);
-  if (!user) return bad('Log in to continue.', 401);
-  const { course, plan } = await body(req);
+  if (limited(req, 'checkout', 20)) return bad('Too many attempts. Try again in a minute.', 429);
+  const { course, plan, email: rawEmail, name: rawName } = await body(req);
   if (!COURSES[course] || !PLANS.includes(plan)) return bad('Unknown course or payment plan.');
   if (!polarConfigured()) return json({ error: 'Checkout is not open yet. Please check back soon.', code: 'not_configured' }, 503);
 
-  const owned = await query(`SELECT course_id FROM enrollments WHERE user_id = $1 AND status = 'active' AND course_id = ANY($2)`, [user.id, grants(course)]);
-  if (owned.rows.length === grants(course).length) return json({ error: 'You already own this course.', code: 'owned' }, 409);
+  const user = await currentUser(req);
+  const email = (user ? user.email : String(rawEmail || '')).trim().toLowerCase();
+  const name = (user ? user.name : typeof rawName === 'string' ? rawName.trim().slice(0, 80) : '') || '';
+  if (!validEmail(email)) return bad('Enter a valid email address.');
+
+  const owned = await query(
+    `SELECT e.course_id FROM enrollments e JOIN users u ON u.id = e.user_id WHERE u.email = $1 AND e.status = 'active' AND e.course_id = ANY($2)`,
+    [email, grants(course)]
+  );
+  if (owned.rows.length === grants(course).length) return json({ error: 'This email already has this course.', code: 'owned' }, 409);
 
   const client = polar();
   const product = await findProduct(client, course, plan);
@@ -22,9 +31,9 @@ export async function POST(req) {
   const site = siteUrl(req);
   const checkout = await client.checkouts.create({
     products: [product.id],
-    customer_email: user.email,
-    ...(user.name ? { customer_name: user.name } : {}),
-    metadata: { academy: '1', user_id: user.id, course_id: course, plan },
+    customer_email: email,
+    ...(name ? { customer_name: name } : {}),
+    metadata: { academy: '1', course_id: course, plan, ...(user ? { user_id: user.id } : { email, ...(name ? { name } : {}) }) },
     // {CHECKOUT_ID} is substituted by Polar, so it is appended by hand to keep the braces unencoded.
     success_url: `${site}/success.html?checkout_id={CHECKOUT_ID}`,
     return_url: `${site}/checkout.html?course=${encodeURIComponent(course)}&plan=${plan}`

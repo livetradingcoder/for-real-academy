@@ -13,6 +13,7 @@ export async function hashPassword(pw) {
 }
 
 export async function verifyPassword(pw, stored) {
+  if (!stored) return false;
   const [alg, saltHex, hashHex] = String(stored).split('$');
   if (alg !== 'scrypt') return false;
   const expected = Buffer.from(hashHex, 'hex');
@@ -49,5 +50,7 @@ export async function currentUser(req) {
   const { rows } = await query('SELECT id, email, name FROM users WHERE id = $1', [data.uid]);
   return rows[0] || null;
 }
+
+export function mintSession(userId, req) { return sessionCookie(userId, req); }
 
 export const validEmail = e => typeof e === 'string' && e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);

@@ -12,30 +12,30 @@
   $('co-full').textContent = '$' + course.price;
   $('co-split').textContent = course.installments.count + ' × $' + course.installments.each + '/mo';
   document.querySelector('input[value="' + plan + '"]').checked = true;
-  var pay = $('co-pay'), err = $('co-error'), terms = $('co-terms'), gate = $('co-login');
+  var pay = $('co-pay'), err = $('co-error'), terms = $('co-terms'), email = $('co-email');
   function render() {
     plan = document.querySelector('input[name=plan]:checked').value;
     $('co-total').textContent = plan === 'full' ? '$' + course.price + ' today' : '$' + course.installments.each + ' today, then ' + (course.installments.count - 1) + ' more monthly payments';
     history.replaceState(null, '', '?course=' + course.id + '&plan=' + plan);
-    gate.querySelectorAll('a').forEach(function (a) { a.href = a.href.split('?')[0] + '?next=' + encodeURIComponent(location.pathname + location.search) + (a.dataset.signup ? '&mode=signup' : ''); });
+    $('co-login').querySelector('a').href = '/login.html?next=' + encodeURIComponent(location.pathname + location.search);
   }
   document.querySelectorAll('input[name=plan]').forEach(function (r) { r.addEventListener('change', render); });
   render();
-  var user = null;
   FRA.me().then(function (d) {
-    user = d.user;
-    $('co-account').textContent = user ? 'Signed in as ' + user.email : '';
-    gate.hidden = !!user; $('co-pay-wrap').hidden = !user;
+    if (!d.user) return;
+    email.value = d.user.email; email.readOnly = true; $('co-name').value = d.user.name || ''; $('co-name').readOnly = true;
+    $('co-email-note').textContent = 'Signed in. This course will be added to your account.'; $('co-login').hidden = true;
   });
+  function fail(msg) { err.textContent = msg; err.hidden = false; pay.disabled = false; pay.textContent = 'Pay securely with Polar'; }
   pay.addEventListener('click', function () {
     err.hidden = true;
-    if (!terms.checked) { err.textContent = 'Please accept the terms and refund policy to continue.'; err.hidden = false; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { fail('Enter a valid email address.'); email.focus(); return; }
+    if (!terms.checked) { fail('Please accept the terms and refund policy to continue.'); return; }
     pay.disabled = true; pay.textContent = 'Redirecting to secure checkout…';
-    FRA.api('/api/checkout', 'POST', { course: course.id, plan: plan }).then(function (r) {
+    FRA.api('/api/checkout', 'POST', { course: course.id, plan: plan, email: email.value.trim(), name: $('co-name').value }).then(function (r) {
       if (r.url) { location.href = r.url; return; }
-      err.innerHTML = ''; err.append(r.error || 'Could not start checkout. Please try again.');
-      if (r.code === 'owned') { err.append(' '); var a = document.createElement('a'); a.href = '/dashboard.html'; a.textContent = 'Go to your courses'; err.append(a); }
-      err.hidden = false; pay.disabled = false; pay.textContent = 'Pay securely with Polar';
-    }).catch(function () { err.textContent = 'Network error. Please try again.'; err.hidden = false; pay.disabled = false; pay.textContent = 'Pay securely with Polar'; });
+      fail(r.error || 'Could not start checkout. Please try again.');
+      if (r.code === 'owned') { err.append(' '); var a = document.createElement('a'); a.href = '/login.html?next=%2Fdashboard.html'; a.textContent = 'Log in to your courses'; err.append(a); }
+    }).catch(function () { fail('Network error. Please try again.'); });
   });
 })();

@@ -14,6 +14,6 @@ export async function POST(req) {
     'INSERT INTO users (email, name, password_hash) VALUES ($1,$2,$3) ON CONFLICT (email) DO NOTHING RETURNING id, email, name',
     [email, display || null, await hashPassword(password)]
   );
-  if (!rows[0]) return bad('An account with this email already exists. Log in instead.', 409);
+  if (!rows[0]) return bad('An account with this email already exists. Log in instead. If you bought a course without setting a password, log in from the browser you paid with or email hello@forrealtech.dev.', 409);
   return json({ user: rows[0] }, 201, { 'set-cookie': sessionCookie(rows[0].id, req) });
 }

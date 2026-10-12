@@ -5,9 +5,10 @@ CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL UNIQUE,
   name text,
-  password_hash text NOT NULL,
+  password_hash text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
 CREATE TABLE IF NOT EXISTS enrollments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,

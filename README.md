@@ -6,6 +6,8 @@ Vercel serverless functions in `api/` for accounts, Polar checkout and progress 
 ## What's in here
 - Static pages: home, courses, course pages, blog, about, legal. Shared look in `styles.css` (light/dark via `theme.js`).
 - App screens: `login.html`, `checkout.html`, `dashboard.html`, `learn.html`, `success.html` (scripts in `app/`).
+- Guest checkout: no account is needed to pay. The buyer enters an email, pays on Polar, and lands on `success.html`, which confirms
+  the payment with Polar, creates the account from the payment, signs the buyer in and asks them to choose a password.
 - API (`api/`): `auth/*` (signup, login, logout, me), `checkout`, `checkout-status`, `progress`, `lesson`, `webhooks/polar`, `status`.
 - Postgres tables (`users`, `enrollments`, `payments`, `progress`) are created automatically on first request (`api/_lib/db.js`).
 
@@ -44,4 +46,7 @@ Needs Node 22. Without the env vars the static pages still work; accounts and ch
 ## Before going live
 - Set the real prices in `config.js` and on the Polar products, and keep them in sync.
 - `CONTENT-TO-VERIFY.md` lists the copy to check. Confirm the terms, privacy and refund pages match how you operate.
-- There is no email verification or password reset yet (needs a mail provider). Until then, reset passwords by hand in the DB.
+- **Add email verification and password reset (needs a mail provider).** Until then:
+  - Accounts created by a purchase are unverified. Someone could pay with another person's email and set the password first, which would block that person from registering. Signup for such an email returns a 409 pointing them to support.
+  - A buyer who closes the success page without choosing a password stays signed in for 30 days and sees a "finish setting up your account" banner on the dashboard. After that they are locked out until you set a password by hand.
+  - Fix both by emailing a set-password / magic link after payment.

@@ -11,7 +11,7 @@ export async function POST(req) {
   const email = String(raw || '').trim().toLowerCase();
   const { rows } = await query('SELECT id, email, name, password_hash FROM users WHERE email = $1', [email]);
   const user = rows[0];
-  const ok = await verifyPassword(String(password || ''), user ? user.password_hash : DUMMY);
+  const ok = await verifyPassword(String(password || ''), user?.password_hash || DUMMY) && !!user?.password_hash;
   if (!user || !ok) return bad('Wrong email or password.', 401);
   return json({ user: { id: user.id, email: user.email, name: user.name } }, 200, { 'set-cookie': sessionCookie(user.id, req) });
 }

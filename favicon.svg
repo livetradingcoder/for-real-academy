@@ -1,0 +1,6 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="frtMarkTitle">
+  <title id="frtMarkTitle">For Real Tech</title>
+  <rect width="32" height="32" rx="8" fill="#17171c"/>
+  <path d="M11 8.5C11 7.67 11.67 7 12.5 7H21.5C22.328 7 23 7.672 23 8.5C23 9.328 22.328 10 21.5 10H14V15H20C20.828 15 21.5 15.672 21.5 16.5C21.5 17.328 20.828 18 20 18H14V23.5C14 24.328 13.328 25 12.5 25C11.672 25 11 24.328 11 23.5V8.5Z" fill="#F4F4F2"/>
+  <circle cx="22.5" cy="22.5" r="2.5" fill="#ff7759"/>
+</svg>

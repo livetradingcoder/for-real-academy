@@ -70,7 +70,7 @@ const setEnv = (name, value, sensitive = true) => {
   return true;
 };
 let ok = setEnv('POLAR_ACCESS_TOKEN', token) && setEnv('NEXT_PUBLIC_SITE_URL', site, false);
-if (server === 'sandbox') ok = setEnv('POLAR_SERVER', 'sandbox', false) && ok;
+ok = setEnv('POLAR_SERVER', server, false) && ok; // always set, so switching sandbox <-> production flips the site too
 if (secret) ok = setEnv('POLAR_WEBHOOK_SECRET', secret) && ok;
 else if (apply && !endpoint) ok = false;
 

@@ -65,6 +65,7 @@ const setEnv = (name, value, sensitive = true) => {
   say(`vercel env      ${name} (production${sensitive ? ', sensitive' : ''})`);
   if (!apply) return true;
   const r = spawnSync(vercel, ['env', 'add', name, 'production', ...(sensitive ? ['--sensitive'] : []), '--force', ...extra], { input: value, encoding: 'utf8' });
+  if (r.error) { console.error(`  could not run ${vercel}: ${r.error.message}. Set VERCEL_BIN to the full path of the vercel CLI (see: which vercel).`); return false; }
   if (r.status !== 0) { console.error(`  failed to set ${name}: ${(r.stderr || r.stdout || '').trim().split('\n').pop()}`); return false; }
   return true;
 };
@@ -74,7 +75,7 @@ if (secret) ok = setEnv('POLAR_WEBHOOK_SECRET', secret) && ok;
 else if (apply && !endpoint) ok = false;
 
 if (apply && firstProduct) {
-  try { const co = await client.checkouts.create({ products: [firstProduct.id], customer_email: 'setup-check@example.com' }); say(`checkout API OK (${co.id}); it expires unused, nothing is charged`); }
+  try { const co = await client.checkouts.create({ products: [firstProduct.id], customer_email: `setup-check@${new URL(site).hostname.replace(/^www\./, '')}` }); say(`checkout API OK (${co.id}); it expires unused, nothing is charged`); }
   catch (e) { console.error('Checkout test failed:', e.message); ok = false; }
 }
 console.log(apply ? (ok ? '\nDone. Redeploy the project so the new env vars apply, then check /api/status and run a 100%-discount test purchase.' : '\nFinished with errors, see above.') : '\nDry run only. Re-run with --apply.');

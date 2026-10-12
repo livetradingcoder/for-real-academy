@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://for-real-academy.vercel.app/sitemap.xml

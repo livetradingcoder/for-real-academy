@@ -24,6 +24,7 @@ Vercel serverless functions in `api/` for accounts, Polar checkout and progress 
 `GET /api/status` reports which of these the running deployment can see (booleans only).
 
 ## Polar setup
+Fastest: `scripts/polar-bootstrap.mjs` does steps 1 and 2 below and stores the env vars on the linked Vercel project (see the header of that file for the exact command). The manual steps:
 1. `POLAR_ACCESS_TOKEN=... node scripts/polar-setup.mjs` (dry run), then `--create` to make 8 products
    (4 courses x pay-in-full / monthly), tagged `academy_course` + `academy_plan`. Prices come from `config.js`.
 2. Polar, Settings, Webhooks, Add endpoint: `https://<canonical host>/api/webhooks/polar`, format **Raw**, API version **2026-10**,

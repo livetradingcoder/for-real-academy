@@ -9,7 +9,7 @@ export async function POST(req) {
   if (limited(req, 'login', 10)) return bad('Too many attempts. Try again in a minute.', 429);
   const { email: raw, password } = await body(req);
   const email = String(raw || '').trim().toLowerCase();
-  const { rows } = await query('SELECT id, email, name, password_hash FROM users WHERE email = $1', [email]);
+  const { rows } = await query('SELECT id, email, name, password_hash FROM academy.users WHERE email = $1', [email]);
   const user = rows[0];
   const ok = await verifyPassword(String(password || ''), user?.password_hash || DUMMY) && !!user?.password_hash;
   if (!user || !ok) return bad('Wrong email or password.', 401);

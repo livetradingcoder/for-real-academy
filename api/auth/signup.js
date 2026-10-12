@@ -11,7 +11,7 @@ export async function POST(req) {
   if (typeof password !== 'string' || password.length < 8 || password.length > 200) return bad('Password must be at least 8 characters.');
   const display = typeof name === 'string' ? name.trim().slice(0, 80) : '';
   const { rows } = await query(
-    'INSERT INTO users (email, name, password_hash) VALUES ($1,$2,$3) ON CONFLICT (email) DO NOTHING RETURNING id, email, name',
+    'INSERT INTO academy.users (email, name, password_hash) VALUES ($1,$2,$3) ON CONFLICT (email) DO NOTHING RETURNING id, email, name',
     [email, display || null, await hashPassword(password)]
   );
   if (!rows[0]) return bad('An account with this email already exists. Log in instead. If you bought a course without setting a password, log in from the browser you paid with or email hello@forrealtech.dev.', 409);

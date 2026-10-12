@@ -8,8 +8,8 @@ export async function GET(req) {
   if (!user) return json({ user: null });
   const [enrollments, prog, pw] = await Promise.all([
     ownedCourses(user.id),
-    query('SELECT course_id, module_index FROM progress WHERE user_id = $1', [user.id]),
-    query('SELECT (password_hash IS NOT NULL) AS has FROM users WHERE id = $1', [user.id])
+    query('SELECT course_id, module_index FROM academy.progress WHERE user_id = $1', [user.id]),
+    query('SELECT (password_hash IS NOT NULL) AS has FROM academy.users WHERE id = $1', [user.id])
   ]);
   const progress = {};
   for (const r of prog.rows) (progress[r.course_id] ||= []).push(r.module_index);

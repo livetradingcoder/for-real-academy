@@ -19,7 +19,7 @@ export async function POST(req) {
   if (!validEmail(email)) return bad('Enter a valid email address.');
 
   const owned = await query(
-    `SELECT e.course_id FROM enrollments e JOIN users u ON u.id = e.user_id WHERE u.email = $1 AND e.status = 'active' AND (e.expires_at IS NULL OR e.expires_at > now()) AND e.course_id = ANY($2)`,
+    `SELECT e.course_id FROM academy.enrollments e JOIN academy.users u ON u.id = e.user_id WHERE u.email = $1 AND e.status = 'active' AND (e.expires_at IS NULL OR e.expires_at > now()) AND e.course_id = ANY($2)`,
     [email, grants(course)]
   );
   if (owned.rows.length === grants(course).length) return json({ error: 'This email already has access to this.', code: 'owned' }, 409);

@@ -9,7 +9,7 @@ Vercel serverless functions in `api/` for accounts, Polar checkout and progress 
 - Guest checkout: no account is needed to pay. The buyer enters an email, pays on Polar, and lands on `success.html`, which confirms
   the payment with Polar, creates the account from the payment, signs the buyer in and asks them to choose a password.
 - API (`api/`): `auth/*` (signup, login, logout, me), `checkout`, `checkout-status`, `progress`, `lesson`, `webhooks/polar`, `status`.
-- Postgres tables (`users`, `enrollments`, `payments`, `progress`) are created automatically on first request (`api/_lib/db.js`).
+- Postgres tables (`users`, `enrollments`, `payments`, `progress`) live in their own `academy` schema and are created automatically on first request (`api/_lib/db.js`), so the database can be shared with other apps.
 
 ## Environment variables (Vercel, Production, then redeploy)
 | Name | Purpose |

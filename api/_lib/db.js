@@ -1,17 +1,19 @@
 import pg from 'pg';
 
 const SCHEMA = `
-CREATE TABLE IF NOT EXISTS users (
+-- Everything lives in its own schema so it can share a database with other apps without touching their tables.
+CREATE SCHEMA IF NOT EXISTS academy;
+CREATE TABLE IF NOT EXISTS academy.users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   email text NOT NULL UNIQUE,
   name text,
   password_hash text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
-ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
-CREATE TABLE IF NOT EXISTS enrollments (
+ALTER TABLE academy.users ALTER COLUMN password_hash DROP NOT NULL;
+CREATE TABLE IF NOT EXISTS academy.enrollments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES academy.users(id) ON DELETE CASCADE,
   course_id text NOT NULL,
   plan text NOT NULL,
   status text NOT NULL DEFAULT 'active',
@@ -21,19 +23,19 @@ CREATE TABLE IF NOT EXISTS enrollments (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (user_id, course_id)
 );
-ALTER TABLE enrollments ADD COLUMN IF NOT EXISTS expires_at timestamptz;
-CREATE INDEX IF NOT EXISTS enrollments_sub_idx ON enrollments (polar_subscription_id);
-CREATE INDEX IF NOT EXISTS enrollments_order_idx ON enrollments (polar_order_id);
-CREATE TABLE IF NOT EXISTS payments (
+ALTER TABLE academy.enrollments ADD COLUMN IF NOT EXISTS expires_at timestamptz;
+CREATE INDEX IF NOT EXISTS enrollments_sub_idx ON academy.enrollments (polar_subscription_id);
+CREATE INDEX IF NOT EXISTS enrollments_order_idx ON academy.enrollments (polar_order_id);
+CREATE TABLE IF NOT EXISTS academy.payments (
   order_id text PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES academy.users(id) ON DELETE CASCADE,
   course_id text NOT NULL,
   subscription_id text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS payments_sub_idx ON payments (subscription_id);
-CREATE TABLE IF NOT EXISTS progress (
-  user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+CREATE INDEX IF NOT EXISTS payments_sub_idx ON academy.payments (subscription_id);
+CREATE TABLE IF NOT EXISTS academy.progress (
+  user_id uuid NOT NULL REFERENCES academy.users(id) ON DELETE CASCADE,
   course_id text NOT NULL,
   module_index int NOT NULL,
   completed_at timestamptz NOT NULL DEFAULT now(),

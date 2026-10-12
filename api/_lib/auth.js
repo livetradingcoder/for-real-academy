@@ -47,7 +47,7 @@ export async function currentUser(req) {
   let data;
   try { data = JSON.parse(Buffer.from(payload, 'base64url').toString()); } catch { return null; }
   if (!data.uid || data.exp < Date.now() / 1000) return null;
-  const { rows } = await query('SELECT id, email, name FROM users WHERE id = $1', [data.uid]);
+  const { rows } = await query('SELECT id, email, name FROM academy.users WHERE id = $1', [data.uid]);
   return rows[0] || null;
 }
 

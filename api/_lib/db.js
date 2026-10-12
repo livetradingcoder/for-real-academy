@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS enrollments (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (user_id, course_id)
 );
+ALTER TABLE enrollments ADD COLUMN IF NOT EXISTS expires_at timestamptz;
 CREATE INDEX IF NOT EXISTS enrollments_sub_idx ON enrollments (polar_subscription_id);
 CREATE INDEX IF NOT EXISTS enrollments_order_idx ON enrollments (polar_order_id);
 CREATE TABLE IF NOT EXISTS payments (

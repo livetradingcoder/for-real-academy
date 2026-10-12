@@ -2,7 +2,7 @@ import { currentUser, mintSession } from './_lib/auth.js';
 import { json, bad } from './_lib/http.js';
 import { polar, polarConfigured } from './_lib/polar.js';
 import { grant, userFromMetadata, ownedCourses } from './_lib/fulfil.js';
-import { COURSES } from './_lib/catalog.js';
+import { COURSES, expiryFor } from './_lib/catalog.js';
 
 const WINDOW_MS = 48 * 3600 * 1000;
 
@@ -21,7 +21,7 @@ export async function GET(req) {
 
   const owner = await userFromMetadata(md);
   if (!owner) return bad('Unknown checkout.', 404);
-  await grant({ userId: owner.id, course: md.course_id, plan: md.plan, orderId: 'checkout:' + co.id, checkoutId: co.id });
+  await grant({ userId: owner.id, course: md.course_id, plan: md.plan, orderId: 'checkout:' + co.id, checkoutId: co.id, expiresAt: expiryFor(md.course_id) });
 
   const me = await currentUser(req);
   const headers = {};

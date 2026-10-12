@@ -58,6 +58,20 @@ window.ACADEMY = {
       learn: ["Everything in the three courses above", "Lifetime access to course updates"],
       price: 249,
       installments: { count: 3, each: 89 }
+    },
+    {
+      id: "platform-access",
+      modules: ["Launch Your First Website (6 modules)", "AI Tools for Everyday Work (6 modules)", "Build Web Apps with AI Coding Assistants (8 modules)"],
+      who: "Anyone who wants to try the courses before committing, or needs a short burst of learning.",
+      requires: "Nothing beyond a computer and internet access.",
+      outcome: "Hands-on access to every course for three days, including your progress tracking.",
+      title: "Platform Access",
+      level: "All levels",
+      length: "3 days of access",
+      blurb: "Three days of access to every course on the platform. One payment, no subscription.",
+      learn: ["Open every course and module for 3 days", "Track your progress as you go", "Pick one course up as a full purchase any time"],
+      price: 9.99,
+      validityDays: 3
     }
   ]
 };

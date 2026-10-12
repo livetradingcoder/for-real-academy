@@ -10,12 +10,17 @@
   $('co-meta').textContent = course.level + ' · ' + course.length;
   $('co-blurb').textContent = course.blurb;
   $('co-full').textContent = '$' + course.price;
-  $('co-split').textContent = course.installments.count + ' × $' + course.installments.each + '/mo';
+  if (course.installments) $('co-split').textContent = course.installments.count + ' × $' + course.installments.each + '/mo';
+  else { document.querySelector('input[value="split"]').closest('label').hidden = true; plan = 'full'; }
   document.querySelector('input[value="' + plan + '"]').checked = true;
+  if (course.validityDays) {
+    document.querySelector('.checkout .fine').textContent = 'Prices in USD. One payment, no subscription. Access lasts ' + course.validityDays + ' days from payment.';
+    document.querySelector('.check span').innerHTML = 'I agree to the <a href="/terms.html" target="_blank" rel="noopener">Terms</a> and <a href="/refunds.html" target="_blank" rel="noopener">Refund policy</a>.';
+  }
   var pay = $('co-pay'), err = $('co-error'), terms = $('co-terms'), email = $('co-email');
   function render() {
     plan = document.querySelector('input[name=plan]:checked').value;
-    $('co-total').textContent = plan === 'full' ? '$' + course.price + ' today' : '$' + course.installments.each + ' today, then ' + (course.installments.count - 1) + ' more monthly payments';
+    $('co-total').textContent = plan === 'full' ? '$' + course.price + ' today' + (course.validityDays ? ' · access for ' + course.validityDays + ' days' : '') : '$' + course.installments.each + ' today, then ' + (course.installments.count - 1) + ' more monthly payments';
     history.replaceState(null, '', '?course=' + course.id + '&plan=' + plan);
     $('co-login').querySelector('a').href = '/login.html?next=' + encodeURIComponent(location.pathname + location.search);
   }

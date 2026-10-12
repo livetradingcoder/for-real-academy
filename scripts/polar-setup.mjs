@@ -18,7 +18,7 @@ if (!accessToken) { console.error('Set POLAR_ACCESS_TOKEN'); process.exit(1); }
 const client = createPolar({ accessToken, environment: process.env.POLAR_SERVER === 'sandbox' ? 'sandbox' : 'production' });
 
 for (const c of courses) {
-  for (const plan of ['full', 'split']) {
+  for (const plan of c.installments ? ['full', 'split'] : ['full']) {
     const found = await client.products.list({ metadata: { academy_course: c.id, academy_plan: plan }, is_archived: false, limit: 5 });
     if (found.items.some(p => p.metadata?.academy_course === c.id && p.metadata?.academy_plan === plan)) { console.log(`exists   ${c.id} / ${plan}`); continue; }
     const cents = Math.round((plan === 'full' ? c.price : c.installments.each) * 100);

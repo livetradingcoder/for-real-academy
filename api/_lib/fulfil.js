@@ -1,5 +1,5 @@
 import { query } from './db.js';
-import { COURSES, INSTALMENTS, grants } from './catalog.js';
+import { COURSES, INSTALMENTS, grants, expiryFor } from './catalog.js';
 
 export async function findOrCreateUser(email, name) {
   const { rows } = await query(
@@ -20,16 +20,28 @@ export async function userFromMetadata(md) {
   return md.email ? findOrCreateUser(md.email, md.name) : null;
 }
 
-export async function grant({ userId, course, plan, orderId, checkoutId, subscriptionId }) {
+export async function grant({ userId, course, plan, orderId, checkoutId, subscriptionId, expiresAt = null }) {
   for (const id of grants(course)) {
     await query(
-      `INSERT INTO enrollments (user_id, course_id, plan, polar_order_id, polar_checkout_id, polar_subscription_id)
-       VALUES ($1,$2,$3,$4,$5,$6)
+      `INSERT INTO enrollments (user_id, course_id, plan, polar_order_id, polar_checkout_id, polar_subscription_id, expires_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7)
        ON CONFLICT (user_id, course_id) DO UPDATE SET
          status = 'active', plan = EXCLUDED.plan, polar_order_id = EXCLUDED.polar_order_id,
          polar_checkout_id = COALESCE(EXCLUDED.polar_checkout_id, enrollments.polar_checkout_id),
-         polar_subscription_id = COALESCE(EXCLUDED.polar_subscription_id, enrollments.polar_subscription_id)`,
-      [userId, id, plan, orderId, checkoutId || null, subscriptionId || null]
+         polar_subscription_id = COALESCE(EXCLUDED.polar_subscription_id, enrollments.polar_subscription_id),
+         expires_at = CASE
+           WHEN EXCLUDED.expires_at IS NULL THEN NULL
+           WHEN enrollments.status = 'active' AND enrollments.expires_at IS NULL THEN NULL
+           ELSE GREATEST(COALESCE(enrollments.expires_at, EXCLUDED.expires_at), EXCLUDED.expires_at) END
+       WHERE
+         -- a timed pass never replaces (or takes over the refund link of) access that is already permanent
+         NOT (EXCLUDED.expires_at IS NOT NULL AND enrollments.status = 'active' AND enrollments.expires_at IS NULL)
+         AND (
+           -- the checkout-return fallback only fills a gap; it never overwrites what the webhook recorded
+           (EXCLUDED.polar_order_id LIKE 'checkout:%' AND enrollments.polar_checkout_id IS DISTINCT FROM EXCLUDED.polar_checkout_id)
+           OR (EXCLUDED.polar_order_id NOT LIKE 'checkout:%' AND enrollments.polar_order_id IS DISTINCT FROM EXCLUDED.polar_order_id)
+         )`,
+      [userId, id, plan, orderId, checkoutId || null, subscriptionId || null, expiresAt]
     );
   }
 }
@@ -56,7 +68,7 @@ export async function onOrderPaid(order, client) {
   const subscriptionId = order.subscription_id || null;
   await query('INSERT INTO payments (order_id, user_id, course_id, subscription_id) VALUES ($1,$2,$3,$4) ON CONFLICT DO NOTHING', [orderId, userId, course, subscriptionId]);
   if (order.billing_reason === 'purchase' || order.billing_reason === 'subscription_create') {
-    await grant({ userId, course, plan, orderId, checkoutId: order.checkout_id, subscriptionId });
+    await grant({ userId, course, plan, orderId, checkoutId: order.checkout_id, subscriptionId, expiresAt: expiryFor(course, Date.parse(order.created_at) || Date.now()) });
   }
   if (plan === 'split' && subscriptionId) {
     const { rows } = await query('SELECT count(*)::int AS n FROM payments WHERE subscription_id = $1', [subscriptionId]);
@@ -80,11 +92,11 @@ export async function onSubscriptionRevoked(sub) {
 }
 
 export async function ownedCourses(userId) {
-  const { rows } = await query(`SELECT course_id, plan, status FROM enrollments WHERE user_id = $1 ORDER BY created_at`, [userId]);
+  const { rows } = await query(`SELECT course_id, plan, status, expires_at FROM enrollments WHERE user_id = $1 ORDER BY created_at`, [userId]);
   return rows;
 }
 
 export async function hasAccess(userId, course) {
-  const { rows } = await query(`SELECT 1 FROM enrollments WHERE user_id = $1 AND course_id = $2 AND status = 'active'`, [userId, course]);
+  const { rows } = await query(`SELECT 1 FROM enrollments WHERE user_id = $1 AND course_id = $2 AND status = 'active' AND (expires_at IS NULL OR expires_at > now())`, [userId, course]);
   return !!rows[0];
 }

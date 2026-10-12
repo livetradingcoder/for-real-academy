@@ -49,7 +49,7 @@
   $('crumb').textContent = course.title; $('course-name').textContent = course.title;
   FRA.me().then(function (d) {
     if (!d.user) { location.replace('/login.html?next=' + encodeURIComponent(location.pathname + location.search)); return; }
-    var e = (d.enrollments || []).filter(function (x) { return x.course_id === id && x.status === 'active'; })[0];
+    var e = (d.enrollments || []).filter(function (x) { return x.course_id === id && x.status === 'active' && (!x.expires_at || new Date(x.expires_at) > new Date()); })[0];
     if (!e) { location.replace('/courses.html'); return; }
     done = (d.progress || {})[id] || [];
     var n = parseInt(location.hash.slice(2), 10);

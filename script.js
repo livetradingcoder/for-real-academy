@@ -10,6 +10,8 @@
       '<div class="meta">' + c.level + ' · ' + c.length + '</div>' +
       '<h3>' + c.title + '</h3><p>' + c.blurb + '</p>' +
       '<ul>' + c.learn.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ul>' +
+      '<details><summary>Curriculum</summary><ol>' + c.modules.map(function (m) { return '<li>' + m + '</li>'; }).join('') + '</ol>' +
+      '<p><strong>Who it\'s for:</strong> ' + c.who + '</p><p><strong>You\'ll need:</strong> ' + c.requires + '</p><p><strong>You\'ll finish with:</strong> ' + c.outcome + '</p></details>' +
       '<div class="push"><div class="price">' + money(c.price) + ' <small>USD, one-time</small></div>' +
       '<div class="opts">' +
       '<label class="opt"><span><input type="radio" name="' + c.id + '" value="full" checked>Pay in full</span><strong>' + money(c.price) + '</strong></label>' +

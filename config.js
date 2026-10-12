@@ -6,6 +6,10 @@ window.ACADEMY = {
   courses: [
     {
       id: "web-launch",
+      modules: ["Browser, editor and how the web works", "HTML: structure, text, links, images, forms", "CSS: layout, flexbox, grid, responsive design", "JavaScript basics: events, DOM, a small interactive feature", "Git and GitHub: commits, branches, publishing your code", "Deploy: free hosting, custom domain, HTTPS, going live"],
+      who: "Anyone starting from zero: career changers, students, small-business owners who want their own site.",
+      requires: "A computer (Windows, Mac or Linux) and internet access. No prior coding needed.",
+      outcome: "A live personal or small-business website you built and published.",
       title: "Launch Your First Website",
       level: "Beginner",
       length: "6 modules · about 8 hours",
@@ -17,6 +21,10 @@ window.ACADEMY = {
     },
     {
       id: "ai-tools",
+      modules: ["How AI assistants work and where they fail", "Prompting: context, examples, constraints, iteration", "Writing and editing with AI without losing your voice", "Research and summarising: checking sources and facts", "Spreadsheets, email and repeatable workflows", "Privacy, safety and responsible use"],
+      who: "Professionals, freelancers and students who want to use AI assistants productively and carefully.",
+      requires: "An account with any AI assistant (free tiers work). No technical background needed.",
+      outcome: "A personal prompt library and three workflows you use in your own work.",
       title: "AI Tools for Everyday Work",
       level: "Beginner",
       length: "5 modules · about 6 hours",
@@ -28,6 +36,10 @@ window.ACADEMY = {
     },
     {
       id: "ai-web-apps",
+      modules: ["Planning an app: requirements and small tasks", "Project setup, a modern framework and a database", "Working with an AI coding assistant: prompts, context, review", "Authentication and user data", "Testing and debugging generated code", "Reading diffs and spotting security and quality problems", "Deployment, environment variables and monitoring", "Capstone: ship your own app"],
+      who: "People who know basic HTML/CSS/JavaScript, for example from Launch Your First Website, and want to build full web apps faster.",
+      requires: "Comfort with basic JavaScript and Git; an AI coding assistant of your choice (free tiers work for most exercises).",
+      outcome: "A deployed, database-backed web app of your own design.",
       title: "Build Web Apps with AI Coding Assistants",
       level: "Intermediate",
       length: "8 modules · about 12 hours",
@@ -39,6 +51,10 @@ window.ACADEMY = {
     },
     {
       id: "bundle",
+      modules: ["Launch Your First Website (6 modules)", "AI Tools for Everyday Work (5 modules)", "Build Web Apps with AI Coding Assistants (8 modules)"],
+      who: "Beginners who want the whole path, in order, at a lower price than buying separately.",
+      requires: "Nothing beyond a computer and internet access.",
+      outcome: "A website, a set of AI workflows and a deployed web app.",
       title: "Complete Bundle — All Three Courses",
       level: "All levels",
       length: "19 modules · about 26 hours",

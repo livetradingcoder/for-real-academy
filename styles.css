@@ -37,3 +37,5 @@ input[type=text],input[type=email],textarea,select{width:100%;padding:12px;borde
 .footer .addr{max-width:320px;line-height:1.6}.legal{max-width:760px;padding:56px 20px 80px;margin:0 auto}.legal h2{font-size:1.4rem;margin-top:1.6em}
 .note{background:var(--wash);border-radius:12px;padding:14px 18px;font-size:.92rem}
 @media(max-width:700px){.nav nav a.hide-m{display:none}.hero{padding:56px 0 48px}.band{padding:56px 0}}
+
+.card details{border:0;padding:0 0 16px}.card details summary{font:500 .95rem var(--font-b);color:var(--blue)}.card details ol{padding-left:20px;margin:10px 0}.card details p{font-size:.9rem}

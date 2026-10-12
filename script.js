@@ -21,10 +21,8 @@
       '<label class="opt"><span><input type="radio" name="' + c.id + '" value="split">' + c.installments.count + ' monthly payments</span><strong>' + money(c.installments.each) + '/mo</strong></label>' +
       '</div><a class="btn block" href="#">Enroll</a></div>';
     var btn = el.querySelector('.btn');
-    btn.addEventListener('click', function (e) {
-      var v = el.querySelector('input:checked').value;
-      var url = c.checkout && c.checkout[v];
-      btn.href = url || ('mailto:' + cfg.email + '?subject=' + encodeURIComponent('Enrollment: ' + c.title + ' (' + v + ')'));
+    btn.addEventListener('click', function () {
+      btn.href = '/checkout.html?course=' + encodeURIComponent(c.id) + '&plan=' + el.querySelector('input:checked').value;
     });
     root.appendChild(el);
   });

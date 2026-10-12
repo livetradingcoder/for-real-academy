@@ -1,6 +1,5 @@
-// For Real Academy — course catalogue and checkout links.
-// Replace each `checkout` URL with the Polar checkout link for that product
-// (Polar dashboard → Products → Checkout Links). Until set, buttons open the contact page.
+// For Real Academy — course catalogue (display copy and display prices).
+// Real prices live on the Polar products (see scripts/polar-setup.mjs); keep these numbers in sync with them.
 window.ACADEMY = {
   email: "hello@forrealtech.dev",
   courses: [
@@ -16,8 +15,7 @@ window.ACADEMY = {
       blurb: "Go from blank folder to a live, mobile-friendly website on your own domain. HTML, CSS, a little JavaScript, Git and free hosting.",
       learn: ["Structure pages with semantic HTML", "Style responsive layouts with modern CSS", "Add forms and simple interactivity", "Version your work with Git and GitHub", "Deploy and connect a custom domain"],
       price: 79,
-      installments: { count: 3, each: 29 },
-      checkout: { full: "", split: "" }
+      installments: { count: 3, each: 29 }
     },
     {
       id: "ai-tools",
@@ -27,12 +25,11 @@ window.ACADEMY = {
       outcome: "A personal prompt library and three workflows you use in your own work.",
       title: "AI Tools for Everyday Work",
       level: "Beginner",
-      length: "5 modules · about 6 hours",
+      length: "6 modules · about 6 hours",
       blurb: "Use AI assistants well: write better prompts, check the output, and build repeatable workflows for writing, research, spreadsheets and email.",
       learn: ["Write clear prompts and iterate on results", "Verify AI output and spot mistakes", "Automate routine writing and research tasks", "Handle privacy and data safely", "Build a personal prompt library"],
       price: 99,
-      installments: { count: 3, each: 36 },
-      checkout: { full: "", split: "" }
+      installments: { count: 3, each: 36 }
     },
     {
       id: "ai-web-apps",
@@ -46,23 +43,21 @@ window.ACADEMY = {
       blurb: "Build and ship a working full-stack web app using AI coding assistants, while learning enough to review, test and fix what they produce.",
       learn: ["Plan an app and split it into small tasks", "Pair with an AI assistant without losing control", "Build a database-backed app with auth", "Test, debug and review generated code", "Deploy and monitor your app"],
       price: 149,
-      installments: { count: 3, each: 54 },
-      checkout: { full: "", split: "" }
+      installments: { count: 3, each: 54 }
     },
     {
       id: "bundle",
-      modules: ["Launch Your First Website (6 modules)", "AI Tools for Everyday Work (5 modules)", "Build Web Apps with AI Coding Assistants (8 modules)"],
+      modules: ["Launch Your First Website (6 modules)", "AI Tools for Everyday Work (6 modules)", "Build Web Apps with AI Coding Assistants (8 modules)"],
       who: "Beginners who want the whole path, in order, at a lower price than buying separately.",
       requires: "Nothing beyond a computer and internet access.",
       outcome: "A website, a set of AI workflows and a deployed web app.",
       title: "Complete Bundle — All Three Courses",
       level: "All levels",
-      length: "19 modules · about 26 hours",
+      length: "20 modules · about 26 hours",
       blurb: "All three courses at a bundle discount. A full path from first website to AI-assisted web apps.",
       learn: ["Everything in the three courses above", "Lifetime access to course updates"],
       price: 249,
-      installments: { count: 3, each: 89 },
-      checkout: { full: "", split: "" }
+      installments: { count: 3, each: 89 }
     }
   ]
 };
